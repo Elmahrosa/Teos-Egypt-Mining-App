@@ -1,0 +1,13 @@
+Teos-Egypt-Mining-App/
+├── index.html
+├── package.json
+├── postcss.config.js
+├── tailwind.config.js
+├── vite.config.js
+├── public/
+│   ├── pwa-192x192.png
+│   └── pwa-512x512.png
+└── src/
+    ├── App.jsx
+    ├── index.css
+    └── main.jsx
