@@ -1,19 +1,4 @@
-Teos-Egypt-Mining-App/
-├── index.html
-├── package.json
-├── postcss.config.js
-├── tailwind.config.js
-├── vite.config.js
-├── public/
-│   ├── pwa-192x192.png
-│   └── pwa-512x512.png
-└── src/
-    ├── App.jsx
-    ├── index.css
-    └── main.jsx
-Thank you for sharing the complete setup guide!  
-If you would like, I can generate a sample directory structure and provide you with ready-to-use file templates for your TEOS Egypt Mining App. 
-
+  
 Here’s what your project directory should look like, along with the main files referenced in your guide:
 
 ```
