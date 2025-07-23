@@ -97,7 +97,7 @@ The TEOS Egypt Mining App addresses the barriers of traditional cryptocurrency m
 ## 🌐 Live Demo
 
 - **Token Stats**: Track $TEOS on [Solscan](https://solscan.io/token/AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo)
-- **Trading**: Available on [Dexlab]([https://dexlab.space/](https://app.dexlab.space/token-hub/AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo?tab=overview))
+- **Trading**: Available on [Dexlab] ([https://dexlab.space/](https://app.dexlab.space/token-hub/AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo?tab=overview)
 - **GitHub**: [Elmahrosa Organization](https://github.com/Elmahrosa)
 
 ---
