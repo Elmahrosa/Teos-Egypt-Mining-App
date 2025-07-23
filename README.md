@@ -1,5 +1,5 @@
 # Teos-paw-mining-app
-Repository created autonomously  by Elmahrosa international 
+Repository created autonomously  by Elmahrosa International 
 Below is a professional and concise **README.md** for the TEOS Egypt Mining App repository, tailored to reflect the provided project overview and aligned with the innovative, decentralized vision of the TEOS Egypt ecosystem. This README is designed to attract developers, users, and potential collaborators while clearly explaining the project’s purpose, features, and setup instructions.
 
 ---
@@ -97,7 +97,7 @@ The TEOS Egypt Mining App addresses the barriers of traditional cryptocurrency m
 ## 🌐 Live Demo
 
 - **Token Stats**: Track $TEOS on [Solscan](https://solscan.io/token/AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo)
-- **Trading**: Available on [Dexlab](https://dexlab.space/)
+- **Trading**: Available on [Dexlab]([https://dexlab.space/](https://app.dexlab.space/token-hub/AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo?tab=overview))
 - **GitHub**: [Elmahrosa Organization](https://github.com/Elmahrosa)
 
 ---
