@@ -444,5 +444,111 @@
     updateProgressBars(0);
   </script>
 </body>
+</html><!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TEOS Egypt Mining App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+</head>
+<body class="bg-black text-white font-sans p-6">
+  <div class="max-w-2xl mx-auto space-y-6">
+    <h1 class="text-4xl font-bold text-center">🔺 TEOS Egypt Mining</h1>
+
+    <button id="connectWallet" class="bg-purple-700 px-4 py-2 rounded hover:bg-purple-800">Connect Phantom Wallet</button>
+    <p id="walletDisplay" class="text-sm mt-2 text-gray-400"></p>
+
+    <div>
+      <button id="pledgeButton" class="bg-yellow-500 px-4 py-2 rounded">I PLEDGE</button>
+      <p id="pledgeStatus" class="text-green-400 mt-2 hidden">✅ You have pledged allegiance!</p>
+    </div>
+
+    <div class="mt-4">
+      <label class="block mb-1">Choose Mining Tier:</label>
+      <select id="upgradeSelect" class="bg-gray-800 p-2 rounded w-full">
+        <option value="">Select Tier</option>
+        <option value="5">📜 Scribe - $5</option>
+        <option value="10">⚱️ Priest - $10</option>
+        <option value="20">👑 Pharaoh - $20</option>
+      </select>
+      <button id="upgradeButton" class="bg-blue-600 px-4 py-2 rounded mt-2">Upgrade Tier</button>
+      <p id="upgradeStatus" class="text-green-300 mt-2 hidden">✅ Tier upgraded!</p>
+    </div>
+
+    <p id="tierInfo" class="text-cyan-300 mt-4 hidden">Your Current Tier: 🧑‍🌾 Peasant</p>
+
+    <footer class="text-sm text-gray-500 mt-8 text-center">
+      Powered by Solana • #TEOS #CryptoEgypt #DeFi
+    </footer>
+  </div>
+
+  <script>
+    let walletAddress = '';
+    const ref = new URLSearchParams(window.location.search).get('ref');
+    if (ref) localStorage.setItem('teos_ref', ref);
+
+    const backendURL = 'https://your-backend.example.com';  // << REPLACE with your actual backend
+
+    document.getElementById('connectWallet').onclick = async () => {
+      if (!window.solana?.isPhantom) return alert("Install Phantom Wallet!");
+      const resp = await window.solana.connect();
+      walletAddress = resp.publicKey.toBase58();
+      document.getElementById('walletDisplay').innerText = `Wallet: ${walletAddress}`;
+
+      await fetch(`${backendURL}/api/register`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({wallet:walletAddress, ref:localStorage.getItem('teos_ref')||null})
+      });
+    };
+
+    document.getElementById('pledgeButton').onclick = async () => {
+      if (!walletAddress) return alert("Please connect your wallet first.");
+      const res = await fetch(`${backendURL}/api/pledge`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({wallet:walletAddress})
+      });
+      if (res.ok) {
+        document.getElementById('pledgeStatus').classList.remove('hidden');
+        document.getElementById('tierInfo').classList.remove('hidden');
+        document.getElementById('tierInfo').innerText = 'Your Current Tier: 🧑‍🌾 Peasant';
+      } else alert('Pledge failed. Try again later.');
+    };
+
+    document.getElementById('upgradeButton').onclick = async () => {
+      if (!walletAddress) return alert("Connect wallet first.");
+      const amount = document.getElementById('upgradeSelect').value;
+      if (!amount) return alert("Select a tier to upgrade.");
+
+      const res = await fetch(`${backendURL}/api/upgrade`, {
+        method: 'POST',
+        headers: {'Content-Type': 'application/json'},
+        body: JSON.stringify({wallet:walletAddress, amount})
+      });
+      const j = await res.json();
+      const stripe = Stripe('pk_test_YOUR_STRIPE_PUBLIC_KEY');
+      await stripe.redirectToCheckout({sessionId: j.sessionId});
+    };
+
+    window.addEventListener('message', e => {
+      if (e.data.type === 'checkout_complete') {
+        document.getElementById('upgradeStatus').classList.remove('hidden');
+        document.getElementById('tierInfo').classList.remove('hidden');
+        document.getElementById('tierInfo').innerText = `Your Current Tier: ${e.data.newTier}`;
+      }
+    });
+
+    // Optional Solana smart contract read
+    (async () => {
+      const conn = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+      const pk = new solanaWeb3.PublicKey('AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo');
+      const acct = await conn.getParsedAccountInfo(pk);
+      console.log('TEOS Token Info:', acct.value);
+    })();
+  </script>
+</body>
 </html>
-CAN YOU TELL ME WHAT IS THIS AND CAN I ADD SOME INFO  AFTER
+
