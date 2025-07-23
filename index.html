@@ -27,3 +27,52 @@
   <script type="module" src="/src/main.jsx"></script>
 </body>
 </html>
+// src/components/SmartContractInfo.jsx
+import React from 'react';
+
+const SmartContractInfo = () => {
+  const contractAddress = "AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo";
+
+  const handleCopy = () => {
+    navigator.clipboard.writeText(contractAddress);
+    alert('Contract address copied to clipboard!');
+  };
+
+  return (
+    <div className="bg-gray-800 rounded-xl p-6 shadow-xl">
+      <h2 className="text-xl font-bold mb-4">Smart Contract</h2>
+      <div className="space-y-4">
+        <div>
+          <p className="text-gray-400 text-sm mb-1">Contract Address</p>
+          <p className="font-mono text-sm p-2 bg-gray-900 rounded overflow-x-auto">
+            {contractAddress}
+          </p>
+          <div className="flex space-x-2 mt-2">
+            <button
+              onClick={handleCopy}
+              className="bg-cyan-600 hover:bg-cyan-700 text-white py-1 px-3 rounded text-sm flex items-center"
+            >
+              <i className="fas fa-copy mr-1"></i> Copy
+            </button>
+            <a
+              href={`https://app.dexlab.space/token-hub/${contractAddress}?tab=overview`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="bg-gray-700 hover:bg-gray-600 text-white py-1 px-3 rounded text-sm flex items-center"
+            >
+              <i className="fas fa-external-link-alt mr-1"></i> Explorer
+            </a>
+          </div>
+        </div>
+        <div>
+          <p className="text-gray-400 text-sm mb-1">Verification</p>
+          <a href="#" className="text-cyan-400 text-sm flex items-center">
+            <i className="fas fa-file-alt mr-2"></i> View Verified Contract Code
+          </a>
+        </div>
+      </div>
+    </div>
+  );
+};
+
+export default SmartContractInfo;
