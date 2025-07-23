@@ -643,3 +643,225 @@
   </script>
 </body>
 </html>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TEOS Egypt Mining App</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://js.stripe.com/v3/"></script>
+  <script src="https://unpkg.com/@solana/web3.js@latest/lib/index.iife.min.js"></script>
+</head>
+<body class="bg-gray-900 text-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-gray-800 rounded-lg p-8 w-full max-w-md space-y-6">
+    <h1 class="text-3xl font-bold text-center">📈 TEOS Egypt Mining</h1>
+
+    <button id="connectWallet" class="w-full bg-purple-600 hover:bg-purple-700 py-2 rounded">
+      Connect Phantom Wallet
+    </button>
+    <p id="walletDisplay" class="text-sm text-gray-400"></p>
+
+    <button id="pledgeButton" class="w-full bg-yellow-500 hover:bg-yellow-600 py-2 rounded">
+      I PLEDGE
+    </button>
+    <p id="pledgeStatus" class="text-green-400 hidden">✅ Pledge recorded!</p>
+
+    <label class="block text-gray-300">Upgrade Tier:</label>
+    <div class="flex space-x-2">
+      <select id="upgradeSelect" class="flex-1 bg-gray-700 text-white p-2 rounded">
+        <option value="">Select Tier</option>
+        <option value="5">📜 Scribe — $5</option>
+        <option value="10">⚱️ Priest — $10</option>
+        <option value="20">👑 Pharaoh — $20</option>
+      </select>
+      <button id="upgradeButton" class="bg-blue-600 hover:bg-blue-700 px-4 py-2 rounded">
+        Upgrade
+      </button>
+    </div>
+    <p id="upgradeStatus" class="text-green-300 hidden">✅ Tier upgraded!</p>
+
+    <p id="tierInfo" class="text-cyan-300 hidden">Your Tier: 🧑‍🌾 Peasant</p>
+
+    <footer class="text-center text-gray-500 text-sm mt-6">
+      Powered by Solana · #TEOS #CryptoEgypt
+    </footer>
+  </div>
+
+  <script src="/app.js"></script>
+</body>
+</html>
+// Dependencies: Stripe.js, @solana/web3.js
+const backendURL = 'https://YOUR_BACKEND_DOMAIN'; // e.g. https://api.teos.app
+
+let walletAddress = null;
+const params = new URLSearchParams(window.location.search);
+const referralCode = params.get('ref');
+
+if (referralCode) localStorage.setItem('teos_ref', referralCode);
+
+// UI Elements
+const connectBtn = document.getElementById('connectWallet');
+const walletDisplay = document.getElementById('walletDisplay');
+const pledgeBtn = document.getElementById('pledgeButton');
+const pledgeStatus = document.getElementById('pledgeStatus');
+const upgradeSelect = document.getElementById('upgradeSelect');
+const upgradeBtn = document.getElementById('upgradeButton');
+const upgradeStatus = document.getElementById('upgradeStatus');
+const tierInfo = document.getElementById('tierInfo');
+
+// Connect Phantom Wallet
+connectBtn.addEventListener('click', async () => {
+  if (!window.solana?.isPhantom) return alert('Please install Phantom.');
+  try {
+    const res = await window.solana.connect();
+    walletAddress = res.publicKey.toBase58();
+    walletDisplay.textContent = `Wallet: ${walletAddress}`;
+    await fetch(`${backendURL}/api/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: walletAddress, referral: localStorage.getItem('teos_ref') })
+    });
+  } catch (err) {
+    console.error(err);
+    alert('Connection failed.');
+  }
+});
+
+// Pledge Action
+pledgeBtn.addEventListener('click', async () => {
+  if (!walletAddress) return alert('Connect your wallet first.');
+  const res = await fetch(`${backendURL}/api/pledge`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ wallet: walletAddress })
+  });
+  if (res.ok) {
+    pledgeStatus.hidden = false;
+    tierInfo.textContent = 'Your Tier: 🧑‍🌾 Peasant';
+    tierInfo.hidden = false;
+  } else {
+    alert('Pledge failed. Try again later.');
+  }
+});
+
+// Upgrade via Stripe
+upgradeBtn.addEventListener('click', async () => {
+  if (!walletAddress) return alert('Connect your wallet first.');
+  const amount = upgradeSelect.value;
+  if (!amount) return alert('Select a tier to upgrade.');
+  try {
+    const response = await fetch(`${backendURL}/api/upgrade`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ wallet: walletAddress, amount })
+    });
+    const { sessionId } = await response.json();
+    const stripe = Stripe('pk_test_YOUR_STRIPE_KEY');
+    await stripe.redirectToCheckout({ sessionId });
+  } catch (err) {
+    console.error(err);
+    alert('Upgrade failed. Please try again.');
+  }
+});
+
+// Listen for webhook callback via URL (Stripe success)
+if (window.location.pathname.endsWith('/success.html')) {
+  upgradeStatus.textContent = '✅ Tier upgraded successfully!';
+  upgradeStatus.hidden = false;
+  tierInfo.textContent = `Your Tier: ${new URLSearchParams(window.location.search).get('tier')}`;
+  tierInfo.hidden = false;
+}
+
+// Fetch TEOS token info from Solana
+(async () => {
+  try {
+    const conn = new solanaWeb3.Connection(solanaWeb3.clusterApiUrl('mainnet-beta'));
+    const pubkey = new solanaWeb3.PublicKey('AhXBUQmbhv9dNoZCiMYmXF4Gyi1cjQthWHFhTL2CJaSo');
+    const info = await conn.getParsedAccountInfo(pubkey);
+    console.log('TEOS Token Info:', info.value);
+  } catch (e) {
+    console.error('Smart contract fetch failed', e);
+  }
+})();
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Upgrade Success</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-green-900 text-white flex items-center justify-center min-h-screen">
+  <div class="text-center space-y-4">
+    <h1 class="text-3xl font-bold">✅ Payment Successful!</h1>
+    <p>Your tier has been upgraded.</p>
+    <a href="/" class="underline">Back to App</a>
+  </div>
+</body>
+</html>
+require('dotenv').config();
+const express = require('express');
+const stripe = require('stripe')(process.env.STRIPE_SECRET);
+const bodyParser = require('body-parser');
+
+const app = express();
+app.use(bodyParser.json());
+app.use(express.static('public'));
+
+const DB = {};  // Replace with real DB (MongoDB/Firebase)
+
+app.post('/api/register', (req, res) => {
+  const { wallet, referral } = req.body;
+  if (!DB[wallet]) {
+    DB[wallet] = { wallet, tier: 'Peasant', pledged: false, referrals: 0, refBy: referral || null };
+    if (referral && DB[referral]) DB[referral].referrals++;
+  }
+  res.sendStatus(200);
+});
+
+app.post('/api/pledge', (req, res) => {
+  const { wallet } = req.body;
+  if (DB[wallet]) DB[wallet].pledged = true;
+  res.sendStatus(DB[wallet] ? 200 : 400);
+});
+
+app.post('/api/upgrade', async (req, res) => {
+  const { wallet, amount } = req.body;
+  const tierMap = { '5': 'Scribe', '10': 'Priest', '20': 'Pharaoh' };
+  const session = await stripe.checkout.sessions.create({
+    payment_method_types: ['card'],
+    mode: 'payment',
+    line_items: [{ price_data: {
+      currency: 'usd',
+      product_data: { name: `TEOS ${tierMap[amount]}` },
+      unit_amount: amount * 100
+    }, quantity: 1 }],
+    metadata: { wallet, tier: tierMap[amount] },
+    success_url: `${process.env.DOMAIN}/success.html?tier=${tierMap[amount]}`,
+    cancel_url: process.env.DOMAIN
+  });
+  res.json({ sessionId: session.id });
+});
+
+app.post('/webhook', bodyParser.raw({ type: 'application/json' }), (req, res) => {
+  const sig = req.headers['stripe-signature'];
+  try {
+    const event = stripe.webhooks.constructEvent(req.body, sig, process.env.STRIPE_WEBHOOK_SECRET);
+    if (event.type === 'checkout.session.completed') {
+      const { wallet, tier } = event.data.object.metadata;
+      if (DB[wallet]) DB[wallet].tier = tier;
+    }
+    res.json({ received: true });
+  } catch (err) {
+    console.error('Webhook error:', err);
+    res.status(400).send(`Webhook Error: ${err.message}`);
+  }
+});
+
+app.listen(process.env.PORT || 3000, () => {
+  console.log('Server running on port', process.env.PORT || 3000);
+});
+STRIPE_SECRET=sk_test_…
+STRIPE_WEBHOOK_SECRET=whsec_…
+DOMAIN=https://YOUR_DOMAIN
